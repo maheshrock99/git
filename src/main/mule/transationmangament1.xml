@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="2bf30f23-1bbf-4dc5-9709-a05619b6b5e6" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="87565f4a-380b-4830-8ea1-eec5f1eda32f" >
+		<db:my-sql-connection host="sql12.freesqldatabase.com" port="3306" user="sql12668272" password="xY391E69tx" database="sql12668272" />
+	</db:config>
+	<db:config name="Database_Config1" doc:name="Database Config" doc:id="e6cfd7a9-bdd3-4195-a654-e8f11530edfd" >
+		<db:my-sql-connection host="sql12.freesqldatabase.com" port="3306" user="sql12668391" password="26GIrwxkcz" database="sql12668391" />
+	</db:config>
+	<flow name="transationmangament1Flow" doc:id="33bf6dec-6dce-4e2e-b0b1-d2d49d562c45" >
+		<http:listener doc:name="Listener" doc:id="22fdf272-163d-4473-a7b6-cdf36aae49b7" config-ref="HTTP_Listener_config" path="/link"/>
+		<try doc:name="Try" doc:id="4e410fe1-9779-4073-b735-547b82eb8543" >
+			<db:insert doc:name="Insert" doc:id="9ccadd37-a477-48c8-99f8-9d1360dfe5a0" config-ref="Database_Config">
+				<db:sql ><![CDATA[INSERT INTO `Member` (`Numbername`, `Numberid`, `Numberloc`) VALUES ('AA', '11', 'HYD');]]></db:sql>
+				<db:input-parameters ><![CDATA[#[{
+	"Numbername" :payload.Numn,
+	"Numberid" :payload.Numid,
+	"Numberloc":payload.Numloc
+}]]]></db:input-parameters>
+			</db:insert>
+			<ee:transform doc:name="Transform Message" doc:id="97fa1bc8-5836-4a22-b037-89f4ac4534c8" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<logger level="INFO" doc:name="Logger" doc:id="026bdc4a-4f4b-4827-b6f4-eb3dc3551b61" message="#[payload]"/>
+			<db:insert doc:name="Insert" doc:id="dfbee66d-ad17-4bac-bb17-33049c4746a2" config-ref="Database_Config1">
+				<db:sql ><![CDATA[INSERT INTO `Member` (`Numbername`, `Numberid`, `Numberloc`) VALUES ('AA', '11', 'HYD');]]></db:sql>
+				<db:input-parameters ><![CDATA[#[{
+	"Numbername" :payload.Numn,
+	"Numberid" :payload.Numid,
+	"Numberloc":payload.Numloc
+}]]]></db:input-parameters>
+			</db:insert>
+			<ee:transform doc:name="Transform Message" doc:id="db65f99f-2669-4289-9328-7d11f30fc1fd" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<logger level="INFO" doc:name="Logger" doc:id="c054545a-42d6-4fa6-9243-43b011bef289" message="#[payload]"/>
+		</try>
+	</flow>
+</mule>
